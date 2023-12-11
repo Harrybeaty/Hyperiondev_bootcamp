@@ -1,0 +1,12 @@
+print("Hello World")
+
+'''
+This is a comment block
+Whatever I put in here will be commented out.
+'''
+
+greeting_phrase = "Hello World"
+print(greeting_phrase)
+
+user_name = input("Please enter your name: ")
+print(f"Hello {user_name}!")
