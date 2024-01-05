@@ -4,9 +4,9 @@ from datetime import datetime, date
 
 #=====constants=======
 DATETIME_STRING_FORMAT = "%Y-%m-%d"
+today = datetime.now().date()
 
-
-def register_user():                                         # Define reg_user function for better modiularity.
+def register_user():                                    # Define reg_user function for better modiularity.
     username_exists = True                              # Initialise bool so it initaites while loop.
     '''Add a new user to the user.txt file'''
     # - Request input of a new username
@@ -85,7 +85,8 @@ def add_task(username_password, task_list):
             print("Invalid datetime format. Please use the format specified")
 
     # Add a unique task number to each task.
-    task_number = str(len(task_data) + 1)                        # Every new task should have a unique task number.
+    
+    task_number = str(len(task_list) + 1)                        # Every new task should have a unique task number.
 
     # Then get the current date.
     curr_date = date.today()
@@ -113,13 +114,16 @@ def view_all(task_list):
         and labelling) 
     '''
     for t in task_list:
-        disp_str = f"Task Number: {t['task_number']}\n"
+        disp_str = f"Task Number:  \t {t['task_number']}\n"
         disp_str += f"Task: \t\t {t['title']}\n"
         disp_str += f"Assigned to: \t {t['username']}\n"
         disp_str += f"Date Assigned: \t {t['assigned_date'].strftime(DATETIME_STRING_FORMAT)}\n"
         disp_str += f"Due Date: \t {t['due_date'].strftime(DATETIME_STRING_FORMAT)}\n"
-        disp_str += f"Task Description: \n {t['description']}\n"
+        disp_str += f"Completed: \t {'Yes' if t['completed'] else 'No'}\n"
+        disp_str += f"Task Description: \n {t['description']}"
+        print("---------------------------------")
         print(disp_str)
+        print("---------------------------------")
 
 
 
@@ -132,13 +136,16 @@ def view_mine(task_list):
 
     for t in task_list:
         if t['username'] == curr_user:
-            disp_str = f"Task Number: {t['task_number']}\n"                                 # Display task number.
+            disp_str = f"Task Number: \t {t['task_number']}\n"                                 # Display task number.
             disp_str += f"Task: \t\t {t['title']}\n"
             disp_str += f"Assigned to: \t {t['username']}\n"
             disp_str += f"Date Assigned: \t {t['assigned_date'].strftime(DATETIME_STRING_FORMAT)}\n"
             disp_str += f"Due Date: \t {t['due_date'].strftime(DATETIME_STRING_FORMAT)}\n"
-            disp_str += f"Task Description: \n {t['description']}\n"
+            disp_str += f"Completed: \t {'Yes' if t['completed'] else 'No'}\n"
+            disp_str += f"Task Description: \n {t['description']}"
+            print("---------------------------------")
             print(f"\n{disp_str}")
+            print("---------------------------------")
 
 def edit_task():
     task_select = input("Input Task Number to find specific task, or press '-1' to go back to the main menu: ")
@@ -152,18 +159,19 @@ def edit_task():
                 found_task = task
                 break
         if found_task:
-            print(f"Task Found!\n{display_task(found_task)}")
-
+            print("Task Found!")
+            print("---------------------------------")
+            print(f"{display_task(found_task)}")
+            print("---------------------------------")
             edit = input("Would you like to edit this task? (yes/no): ")
-            if edit.lower() == 'yes':
+            if edit.lower() == 'yes' and found_task['completed'] == False: 
                 detail = input(''' Select one of the following task details to edit:
-                    1 - Title
-                    2 - Description
-                    3 - Who the task is assigned to
-                    4 - Due date
-                    5 - Completion
-                    : ''')
-
+    1 - Title
+    2 - Description
+    3 - Who the task is assigned to
+    4 - Due date
+    5 - Completion
+    : ''')
                 if detail == '1':
                     found_task['title'] = input("Enter new title: ")
                 elif detail == '2':
@@ -183,22 +191,106 @@ def edit_task():
                 
                 # Update tasks.txt with the edited task
                 write_task(task_list)
-
                 print("Task successfully edited.")
+
+            elif edit.lower() == 'yes' and found_task['completed'] == True:
+                print("Task is completed and cannot be edited.")
             else:
                 print("Task editing canceled.")
         else:
             print("Task number not found.")
 
 def display_task(task):
-    disp_str = f"Task Number: {task['task_number']}\n"
+    disp_str = f"Task Number: \t {task['task_number']}\n"
     disp_str += f"Task: \t\t {task['title']}\n"
     disp_str += f"Assigned to: \t {task['username']}\n"
     disp_str += f"Date Assigned: \t {task['assigned_date'].strftime(DATETIME_STRING_FORMAT)}\n"
     disp_str += f"Due Date: \t {task['due_date'].strftime(DATETIME_STRING_FORMAT)}\n"
-    disp_str += f"Task Description: \n {task['description']}\n"
     disp_str += f"Completed: \t {'Yes' if task['completed'] else 'No'}\n"
+    disp_str += f"Task Description: \n {task['description']}"
     return disp_str
+
+def task_overview():
+
+    incomplete_counter = 0
+    completed_counter = 0
+    overdue_counter = 0
+    total_counter = 0
+
+    for t in task_list:
+        total_counter += 1
+        if t['completed'] == True:
+            completed_counter += 1
+        elif t['completed'] == False and t['due_date'].date() < today:
+            overdue_counter += 1
+            incomplete_counter += 1
+        else:
+            incomplete_counter += 1
+
+    percentage_incomplete = (incomplete_counter/total_counter)*100
+    percentage_overdue = (overdue_counter/total_counter)*100
+
+
+    task_overview_string = f'''Total number of tasks: \t\t\t{total_counter}
+Number of completed tasks: \t\t{completed_counter}
+Number of incomplete tasks: \t{incomplete_counter}
+Number of overdue tasks: \t\t{overdue_counter}
+Percentage of incomplete tasks: {round(percentage_incomplete,2)}%
+Percentage of overdue tasks: \t{round(percentage_overdue,2)}% '''
+
+    with open("task_overview.txt", "w") as task_overview:
+        task_overview.write(task_overview_string)
+
+    return total_counter
+    
+def user_overview(total_counter):  
+    assigned_counter = 0
+    assigned_incomplete_counter = 0
+    assigned_incomplete_overdue_counter = 0
+
+    total_users = len(user_data)
+    with open("user_overview.txt", "w") as user_overview:
+        user_overview.write(f"Total number of users: {total_users}\nTotal mumber of tasks: {total_counter}")
+
+    for user in username_password.keys():
+        
+        for t in task_list:
+            if t['username'] == user and t['completed'] == False and t['due_date'].date() < today:
+                assigned_counter += 1
+                assigned_incomplete_counter += 1
+                assigned_incomplete_overdue_counter += 1
+            elif t['username'] == user and t['completed'] == False:
+                assigned_counter += 1
+                assigned_incomplete_counter += 1
+            elif t['username'] == user:
+                assigned_counter += 1
+
+        try:
+            percentage_assigned = (assigned_counter/total_counter)*100
+            percentage_assigned_completed = ((assigned_counter - assigned_incomplete_counter)/assigned_counter)*100
+            percentage_assigned_incomplete = (assigned_incomplete_counter/assigned_counter)*100
+            percentage_overdue_incomplete = (assigned_incomplete_overdue_counter/assigned_counter)*100
+        except ZeroDivisionError:
+            print(f"No tasks assigned to {user}")
+
+            percentage_assigned = 0
+            percentage_assigned_completed = 0
+            percentage_assigned_incomplete = 0
+            percentage_overdue_incomplete = 0
+
+        user_overview_string = f'''\n\nUser: {user}  
+Number of assigned tasks: \t\t\t\t{assigned_counter}
+Percentage of assigned tasks: \t\t\t{round(percentage_assigned,2)}%
+Percentage of completed tasks: \t\t\t{round(percentage_assigned_completed,2)}%
+Percentage of incomplete tasks: \t\t{round(percentage_assigned_incomplete,2)}%
+Percentage of incomplete overdue tasks: {round(percentage_overdue_incomplete,2)}%'''
+
+        with open("user_overview.txt", "a") as user_overview:
+            user_overview.write(f"{user_overview_string}")    
+
+        assigned_counter = 0
+        assigned_incomplete_counter = 0
+        assigned_incomplete_overdue_counter = 0
 
 # Create tasks.txt if it doesn't exist
 if not os.path.exists("tasks.txt"):
@@ -271,6 +363,7 @@ r - Registering a user
 a - Adding a task
 va - View all tasks
 vm - View my task
+gr - Generate reports
 ds - Display statistics
 e - Exit
 : ''').lower()
@@ -286,13 +379,25 @@ e - Exit
         
     elif menu == 'vm':
         view_mine(task_list)
-        edit_task()      
+        edit_task()
+
+    elif menu == 'gr':
+        total_counter = task_overview()
+        user_overview(total_counter) 
 
     elif menu == 'ds' and curr_user == 'admin': 
         '''If the user is an admin they can display statistics about number of users
             and tasks.'''
-        num_users = len(username_password.keys())
-        num_tasks = len(task_list)
+        num_users = 0
+        num_tasks = 0
+
+        with open("user.txt", "r") as users:
+            for line in users:
+                num_users += 1
+        
+        with open("tasks.txt", "r") as tasks:
+            for line in tasks:
+                num_tasks += 1
 
         print("-----------------------------------")
         print(f"Number of users: \t\t {num_users}")

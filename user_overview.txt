@@ -1,0 +1,30 @@
+Total number of users: 4
+Total mumber of tasks: 9
+
+User: admin  
+Number of assigned tasks: 				4
+Percentage of assigned tasks: 			44.44%
+Percentage of completed tasks: 			50.0%
+Percentage of incomplete tasks: 		50.0%
+Percentage of incomplete overdue tasks: 25.0%
+
+User: harry  
+Number of assigned tasks: 				4
+Percentage of assigned tasks: 			44.44%
+Percentage of completed tasks: 			50.0%
+Percentage of incomplete tasks: 		50.0%
+Percentage of incomplete overdue tasks: 25.0%
+
+User: emily  
+Number of assigned tasks: 				0
+Percentage of assigned tasks: 			0%
+Percentage of completed tasks: 			0%
+Percentage of incomplete tasks: 		0%
+Percentage of incomplete overdue tasks: 0%
+
+User: tom  
+Number of assigned tasks: 				1
+Percentage of assigned tasks: 			11.11%
+Percentage of completed tasks: 			0.0%
+Percentage of incomplete tasks: 		100.0%
+Percentage of incomplete overdue tasks: 100.0%

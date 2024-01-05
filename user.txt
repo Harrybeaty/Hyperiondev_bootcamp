@@ -1,2 +1,4 @@
 admin;password
-Harry Beaty;password
+harry;beaty
+emily;beaty
+tom;beaty
