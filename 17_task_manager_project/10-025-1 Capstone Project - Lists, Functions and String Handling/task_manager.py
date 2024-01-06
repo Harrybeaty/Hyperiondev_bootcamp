@@ -1,3 +1,10 @@
+# Notes: 
+# 1. Use the following username and password to access the admin rights 
+# username: admin
+# password: password
+# 2. Ensure you open the whole folder for this task in VS Code otherwise the 
+# program will look in your root directory for the text files.
+
 #=====importing libraries===========
 import os
 from datetime import datetime, date
@@ -6,7 +13,8 @@ from datetime import datetime, date
 DATETIME_STRING_FORMAT = "%Y-%m-%d"
 today = datetime.now().date()
 
-def register_user():                                    # Define reg_user function for better modiularity.
+
+def register_user():                                    
     username_exists = True                              # Initialise bool so it initaites while loop.
     '''Add a new user to the user.txt file'''
     # - Request input of a new username
@@ -15,39 +23,36 @@ def register_user():                                    # Define reg_user functi
         username_exists = False                         # Set username_exists to false to initially assume the username is unique.
 
         for user in username_password:                  # Loop through username_password dict, easier than looping through file directly.
+                             
             if new_username in username_password:       
                 print("Username already exist, please use another username.")
                 username_exists = True                  # If user name exists, change username_exists to True and stay in while loop.
                 break                                   # Don't need to carry on with loop if user already exists, so break out.
 
-    # - Request input of a new password
     new_password = input("New Password: ")
 
-    # - Request input of password confirmation.
     confirm_password = input("Confirm Password: ")
 
-    # - Check if the new password and confirmed password are the same.
-    if new_password == confirm_password:
-        # - If they are the same, add them to the user.txt file,
+    
+    if new_password == confirm_password:                # If passwords match, add them to the user.txt file.
         print("New user added")
         username_password[new_username] = new_password
-            
         with open("user.txt", "w") as out_file:         
             user_data = []
+
             for k in username_password:
                 user_data.append(f"{k};{username_password[k]}")            
             out_file.write("\n".join(user_data))
 
-    # - Otherwise you present a relevant message.
     else:
         print("Passwords do no match")
 
 
-
-def write_task(task_list):
+def write_task(task_list):                  
     with open("tasks.txt", "w") as task_file:
         task_list_to_write = []
-        for t in task_list:
+
+        for t in task_list:                                # for each task create a list of task details.
             str_attrs = [
                 t['username'],
                 t['title'],
@@ -55,10 +60,11 @@ def write_task(task_list):
                 t['due_date'].strftime(DATETIME_STRING_FORMAT),
                 t['assigned_date'].strftime(DATETIME_STRING_FORMAT),
                 "Yes" if t['completed'] else "No",
-                t['task_number']                                            # Added task number to the end.
+                t['task_number']                           # Added task number to the end.
             ]
             task_list_to_write.append(";".join(str_attrs))
-        task_file.write("\n".join(task_list_to_write))
+        task_file.write("\n".join(task_list_to_write))     # Write to file. 
+
 
 def add_task(username_password, task_list):
     '''Allow a user to add a new task to task.txt file
@@ -70,8 +76,9 @@ def add_task(username_password, task_list):
     task_username = input("Name of person assigned to task: ")
     if task_username not in username_password.keys():
         print("User does not exist. Please enter a valid username")
-        return                                                  # Replaced continue with return because continue can only be used in a loop.
+        return                                               
 
+    # Get task details
     task_title = input("Title of Task: ")
     task_description = input("Description of Task: ")
 
@@ -83,12 +90,9 @@ def add_task(username_password, task_list):
 
         except ValueError:
             print("Invalid datetime format. Please use the format specified")
+ 
+    task_number = str(len(task_list) + 1)                   # Add a unique task number to each task.                     
 
-    # Add a unique task number to each task.
-    
-    task_number = str(len(task_list) + 1)                        # Every new task should have a unique task number.
-
-    # Then get the current date.
     curr_date = date.today()
     ''' Add the data to the file task.txt and
         Include 'No' to indicate if the task is complete.'''
@@ -99,7 +103,7 @@ def add_task(username_password, task_list):
         "due_date": due_date_time,
         "assigned_date": curr_date,
         "completed": False,
-        "task_number": task_number                         # Added task number value.
+        "task_number": task_number                           # Added task number value.
     }
 
     task_list.append(new_task)
@@ -126,8 +130,6 @@ def view_all(task_list):
         print("---------------------------------")
 
 
-
-
 def view_mine(task_list):
     '''Reads the task from task.txt file and prints to the console in the 
            format of Output 2 presented in the task pdf (i.e. includes spacing
@@ -136,7 +138,7 @@ def view_mine(task_list):
 
     for t in task_list:
         if t['username'] == curr_user:
-            disp_str = f"Task Number: \t {t['task_number']}\n"                                 # Display task number.
+            disp_str = f"Task Number: \t {t['task_number']}\n"      # Display task number.
             disp_str += f"Task: \t\t {t['title']}\n"
             disp_str += f"Assigned to: \t {t['username']}\n"
             disp_str += f"Date Assigned: \t {t['assigned_date'].strftime(DATETIME_STRING_FORMAT)}\n"
@@ -147,21 +149,24 @@ def view_mine(task_list):
             print(f"\n{disp_str}")
             print("---------------------------------")
 
+
 def edit_task():
     task_select = input("Input Task Number to find specific task, or press '-1' to go back to the main menu: ")
 
     if task_select == '-1':
         return
     else:
+        # Find the task the user want to edit. 
         found_task = None
         for task in task_list:
             if task['task_number'] == task_select:
                 found_task = task
                 break
+
         if found_task:
-            print("Task Found!")
+            print("Task found!")
             print("---------------------------------")
-            print(f"{display_task(found_task)}")
+            print(f"{display_task(found_task)}")           # Display task the user wants to edit.
             print("---------------------------------")
             edit = input("Would you like to edit this task? (yes/no): ")
             if edit.lower() == 'yes' and found_task['completed'] == False: 
@@ -172,6 +177,7 @@ def edit_task():
     4 - Due date
     5 - Completion
     : ''')
+                # Get new detail.
                 if detail == '1':
                     found_task['title'] = input("Enter new title: ")
                 elif detail == '2':
@@ -200,7 +206,9 @@ def edit_task():
         else:
             print("Task number not found.")
 
-def display_task(task):
+
+# Added display task functionality so the user can see the selected task they want to edit
+def display_task(task): 
     disp_str = f"Task Number: \t {task['task_number']}\n"
     disp_str += f"Task: \t\t {task['title']}\n"
     disp_str += f"Assigned to: \t {task['username']}\n"
@@ -210,76 +218,89 @@ def display_task(task):
     disp_str += f"Task Description: \n {task['description']}"
     return disp_str
 
+
 def task_overview():
+    '''This function will produce a .txt file which will display
+        statistics about how many tasks there are. '''
 
-    incomplete_counter = 0
-    completed_counter = 0
-    overdue_counter = 0
-    total_counter = 0
+    # Initialise counter variables.
+    num_incompleted = 0
+    num_completed = 0
+    num_overdue = 0
+    num_tasks = 0
 
+    # Loop through tasks if task matches the conditionad 1 to the task counter.
     for t in task_list:
-        total_counter += 1
+        num_tasks += 1
         if t['completed'] == True:
-            completed_counter += 1
+            num_completed += 1
         elif t['completed'] == False and t['due_date'].date() < today:
-            overdue_counter += 1
-            incomplete_counter += 1
+            num_overdue += 1
+            num_incompleted += 1
         else:
-            incomplete_counter += 1
+            num_incompleted += 1
 
-    percentage_incomplete = (incomplete_counter/total_counter)*100
-    percentage_overdue = (overdue_counter/total_counter)*100
+    # Calculate percentages
+    percentage_incomplete = (num_incompleted/num_tasks)*100
+    percentage_overdue = (num_overdue/num_tasks)*100
 
-
-    task_overview_string = f'''Total number of tasks: \t\t\t{total_counter}
-Number of completed tasks: \t\t{completed_counter}
-Number of incomplete tasks: \t{incomplete_counter}
-Number of overdue tasks: \t\t{overdue_counter}
+    # Create string with the statistics
+    task_overview_string = f'''Total number of tasks: \t\t\t{num_tasks}
+Number of completed tasks: \t\t{num_completed}
+Number of incomplete tasks: \t{num_incompleted}
+Number of overdue tasks: \t\t{num_overdue}
 Percentage of incomplete tasks: {round(percentage_incomplete,2)}%
 Percentage of overdue tasks: \t{round(percentage_overdue,2)}% '''
 
     with open("task_overview.txt", "w") as task_overview:
         task_overview.write(task_overview_string)
 
-    return total_counter
-    
-def user_overview(total_counter):  
-    assigned_counter = 0
-    assigned_incomplete_counter = 0
-    assigned_incomplete_overdue_counter = 0
+    return num_tasks                                         # Return num_tasks to main to be used in user_overview.
 
+
+def user_overview(num_tasks): 
+    '''Function to display statistics about each user and their number of tasks''' 
+
+    num_assigned = 0
+    num_assigned_incomplete = 0
+    assigned_overdue_incomplete = 0
+
+    # Get number of users and write that and num_tasks to user_overview.txt
     total_users = len(user_data)
     with open("user_overview.txt", "w") as user_overview:
-        user_overview.write(f"Total number of users: {total_users}\nTotal mumber of tasks: {total_counter}")
+        user_overview.write(f"Total number of users: {total_users}\nTotal mumber of tasks: {num_tasks}")
 
     for user in username_password.keys():
         
+        # For each task if condition is met, add 1 to counter.
         for t in task_list:
             if t['username'] == user and t['completed'] == False and t['due_date'].date() < today:
-                assigned_counter += 1
-                assigned_incomplete_counter += 1
-                assigned_incomplete_overdue_counter += 1
+                num_assigned += 1
+                num_assigned_incomplete += 1
+                assigned_overdue_incomplete += 1
             elif t['username'] == user and t['completed'] == False:
-                assigned_counter += 1
-                assigned_incomplete_counter += 1
+                num_assigned += 1
+                num_assigned_incomplete += 1
             elif t['username'] == user:
-                assigned_counter += 1
-
+                num_assigned += 1
+        
+        # Calculate percentages
         try:
-            percentage_assigned = (assigned_counter/total_counter)*100
-            percentage_assigned_completed = ((assigned_counter - assigned_incomplete_counter)/assigned_counter)*100
-            percentage_assigned_incomplete = (assigned_incomplete_counter/assigned_counter)*100
-            percentage_overdue_incomplete = (assigned_incomplete_overdue_counter/assigned_counter)*100
+            percentage_assigned = (num_assigned/num_tasks)*100
+            percentage_assigned_completed = ((num_assigned - num_assigned_incomplete)/num_assigned)*100
+            percentage_assigned_incomplete = (num_assigned_incomplete/num_assigned)*100
+            percentage_overdue_incomplete = (assigned_overdue_incomplete/num_assigned)*100
+
         except ZeroDivisionError:
             print(f"No tasks assigned to {user}")
 
-            percentage_assigned = 0
+            percentage_assigned = 0                         # if no task are assigned to user, set effected values to 0.
             percentage_assigned_completed = 0
             percentage_assigned_incomplete = 0
             percentage_overdue_incomplete = 0
 
         user_overview_string = f'''\n\nUser: {user}  
-Number of assigned tasks: \t\t\t\t{assigned_counter}
+Number of assigned tasks: \t\t\t\t{num_assigned}
 Percentage of assigned tasks: \t\t\t{round(percentage_assigned,2)}%
 Percentage of completed tasks: \t\t\t{round(percentage_assigned_completed,2)}%
 Percentage of incomplete tasks: \t\t{round(percentage_assigned_incomplete,2)}%
@@ -288,16 +309,37 @@ Percentage of incomplete overdue tasks: {round(percentage_overdue_incomplete,2)}
         with open("user_overview.txt", "a") as user_overview:
             user_overview.write(f"{user_overview_string}")    
 
-        assigned_counter = 0
-        assigned_incomplete_counter = 0
-        assigned_incomplete_overdue_counter = 0
+        # Reset counter variables to 0
+        num_assigned = 0
+        num_assigned_incomplete = 0
+        assigned_overdue_incomplete = 0
+
+
+def disp_stats():
+    # If admin is logged in they can display stats.
+    num_users = 0
+    num_tasks = 0
+
+    with open("user.txt", "r") as users:
+        for line in users:
+            num_users += 1
+        
+    with open("tasks.txt", "r") as tasks:
+        for line in tasks:
+            num_tasks += 1
+
+    print("-----------------------------------")
+    print(f"Number of users: \t\t {num_users}")
+    print(f"Number of tasks: \t\t {num_tasks}")
+    print("-----------------------------------")   
+
 
 # Create tasks.txt if it doesn't exist
 if not os.path.exists("tasks.txt"):
-    with open("tasks.txt", "w") as default_file:    # Opens tasks.txt in writing mode, it overwrites also.
+    with open("tasks.txt", "w") as default_file:    
         pass
 
-with open("tasks.txt", 'r') as task_file:           # Opens tasks.txt in reading, file needs to already exist otherwise error.
+with open("tasks.txt", 'r') as task_file:           
     task_data = task_file.read().split("\n")        # Creates list where each line in tasks.txt is an element.
     task_data = [t for t in task_data if t != ""]   # Removes any empty elements from task data.
 
@@ -306,7 +348,7 @@ task_list = []                                      # Task List is a list where 
 for t_str in task_data:                                  
     curr_t = {}                                     
 
-    # Split by semicolon and manually add each component
+    
     task_components = t_str.split(";")              # Split each line into separate components of tasks.txt
     curr_t['username'] = task_components[0]         # Associate components to each key in dict.
     curr_t['title'] = task_components[1]
@@ -316,7 +358,7 @@ for t_str in task_data:
     curr_t['completed'] = True if task_components[5] == "Yes" else False
     curr_t['task_number'] = task_components[6]
 
-    task_list.append(curr_t)                        # Task list contains a dictionary for each task entry as an element.
+    task_list.append(curr_t)                                   # Task list contains a dictionary for each task entry as an element.
 
 
 # Read user.txt and add the contents to a dictionary.
@@ -328,26 +370,26 @@ if not os.path.exists("user.txt"):
 
 # Read in user_data
 with open("user.txt", 'r') as user_file:
-    user_data = user_file.read().split("\n")    # Making a list again which all elements are lines in user.txt.
+    user_data = user_file.read().split("\n")                   # Making a list again which all elements are lines in user.txt.
 
 # Convert to a dictionary
 username_password = {} 
 for user in user_data:
-    username, password = user.split(';')        # Separate username and password.
-    username_password[username] = password      # Associate password with user name in dict    
+    username, password = user.split(';')                       # Separate username and password.
+    username_password[username] = password                     # Associate password with user name in dict    
 
 #Login User
 
 logged_in = False                               
-while not logged_in:                            # While logged in = false.
+while not logged_in:                                           # While logged in = false.
 
-    print("LOGIN")                              # Ask for login.
+    print("LOGIN")                                             # Ask for login.
     curr_user = input("Username: ")
     curr_pass = input("Password: ")
-    if curr_user not in username_password.keys(): # if not already a user
+    if curr_user not in username_password.keys():              
         print("User does not exist")
         continue
-    elif username_password[curr_user] != curr_pass: # if not correct password
+    elif username_password[curr_user] != curr_pass:
         print("Wrong password")                     
         continue
     else:
@@ -355,8 +397,7 @@ while not logged_in:                            # While logged in = false.
         logged_in = True     
 
 while True:
-    # presenting the menu to the user and 
-    # making sure that the user input is converted to lower case.
+    # Present menu to user.
     print()
     menu = input('''Select one of the following options below:
 r - Registering a user
@@ -382,27 +423,11 @@ e - Exit
         edit_task()
 
     elif menu == 'gr':
-        total_counter = task_overview()
-        user_overview(total_counter) 
+        num_tasks = task_overview()
+        user_overview(num_tasks) 
 
     elif menu == 'ds' and curr_user == 'admin': 
-        '''If the user is an admin they can display statistics about number of users
-            and tasks.'''
-        num_users = 0
-        num_tasks = 0
-
-        with open("user.txt", "r") as users:
-            for line in users:
-                num_users += 1
-        
-        with open("tasks.txt", "r") as tasks:
-            for line in tasks:
-                num_tasks += 1
-
-        print("-----------------------------------")
-        print(f"Number of users: \t\t {num_users}")
-        print(f"Number of tasks: \t\t {num_tasks}")
-        print("-----------------------------------")    
+        disp_stats() 
 
     elif menu == 'e':
         print('Goodbye!!!')
