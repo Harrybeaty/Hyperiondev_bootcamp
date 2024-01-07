@@ -13,16 +13,18 @@ for index in range(len(user_string)):                       # Set a for loop to 
 print(final_string)                                         # Print the final string. 
 
 # Changing the case of alternate words.
-words_list = []                                             # Initialise words_list for later use.
+#words_list = []                                            # Initialise words_list for later use.
 list_string = user_string.split(" ")                        # Split user_string into a list where each element is a word. 
 
-for position in range(len(list_string)):                    # Set a loop to count the position of each element in the list.
+words_list = [word.upper() if index % 2 == 0 else word.lower() for index, word in enumerate(list_string)]
+
+""" for position in range(len(list_string)):                    # Set a loop to count the position of each element in the list.
     if position % 2 == 0:                                   # If position is even, convert the word in that position to upper case.
         word = list_string[position].upper()
     else:                                                   # If position is odd, convert the word in that position to lower case.
         word = list_string[position].lower()
     
-    words_list.append(word)                                 # For each iteration add each word to the end of words_list.        
+    words_list.append(word)    """                              # For each iteration add each word to the end of words_list.        
 
 alternate_word_string = " ".join(words_list)                # Join each word in words_list by a space.
 print(alternate_word_string)                                # Print the final string.
